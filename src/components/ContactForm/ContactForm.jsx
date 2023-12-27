@@ -1,45 +1,43 @@
 import { Button, ContForm, Input, Label } from './ContactForm.styled';
 import { nanoid } from 'nanoid';
 import { useState } from 'react';
-import { addContactAction } from '../../redux/contactSlice';
+// import { addContactAction } from '../../redux/contactSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { getContacts } from '../../redux/selectors';
+import { selectContacts } from '../../redux/selectors';
+import { addContactAction } from '../../redux/api';
+const nameId = nanoid();
+const numberId = nanoid();
 
-export const ContactForm = () => {
-  const dispatch = useDispatch();
-  const contacts = useSelector(getContacts);
+export const ContactForm = ({ sumbit }) => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
 
-  const onChangeFilter = event => {
-    const { name, value } = event.currentTarget;
-    if (
-      (name === 'name' && /^[a-zA-Zа-яА-ЯёЁіІїЇєЄґҐ' ]*$/.test(value)) ||
-      (name === 'number' && /^[0-9-]*$/.test(value))
-    ) {
-      if (name === 'name') {
+  const handleChange = event => {
+    const { name, value } = event.target;
+    switch (name) {
+      case 'name':
         setName(value);
-      } else if (name === 'number') {
+        break;
+      case 'number':
         setNumber(value);
-      }
+        break;
+      default:
+        break;
     }
   };
+
   const handleSubmit = event => {
     event.preventDefault();
-    const newContact = {
-      id: nanoid(),
-      name,
-      number,
-    };
-    const isExist = contacts.find(
-      contact => contact.name.toLowerCase() === newContact.name.toLowerCase()
-    );
 
+    const isExist = contacts.some(contact => contact.name === name);
     if (isExist) {
-      alert(`${newContact.name} is contacts.`);
-    } else {
-      dispatch(addContactAction(newContact));
+      alert(`${name} is in contacts`);
+      return;
     }
+    dispatch(addContactAction({ name, number }));
+
     setName('');
     setNumber('');
   };
@@ -52,7 +50,8 @@ export const ContactForm = () => {
           type="text"
           name="name"
           value={name}
-          onChange={onChangeFilter}
+          id={nameId}
+          onChange={handleChange}
           required
         />
       </Label>
@@ -62,7 +61,8 @@ export const ContactForm = () => {
           type="tel"
           name="number"
           value={number}
-          onChange={onChangeFilter}
+          id={numberId}
+          onChange={handleChange}
           required
         />
       </Label>

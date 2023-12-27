@@ -1,21 +1,18 @@
 import { useDispatch } from 'react-redux';
 import { DelButton, Item } from './ContactList.styled';
-import { removeContactAction } from '../../redux/contactSlice';
+import { deleteContactAction } from '../../redux/api';
 
-export const ContactListItem = ({ contact }) => {
+export const ContactListItem = ({ id, name, number }) => {
   const dispatch = useDispatch();
-  const deleteContact = e => {
-    dispatch(removeContactAction(e));
+
+  const handleDelete = () => {
+    dispatch(deleteContactAction(id));
   };
 
   return (
-    <Item>
-      {contact.name}: {contact.number}
-      <DelButton
-        type="button"
-        id={contact.id}
-        onClick={() => deleteContact(contact.id)}
-      >
+    <Item id={id}>
+      {name}: {number}
+      <DelButton type="button" onClick={handleDelete}>
         Delete
       </DelButton>
     </Item>
