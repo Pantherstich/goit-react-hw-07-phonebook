@@ -9,7 +9,6 @@ import {
 } from '../../redux/selectors';
 
 export const ContactList = () => {
-  const contacts = useSelector(selectFilteredContacts);
   const dispatch = useDispatch();
   const error = useSelector(selectError);
   const isLoading = useSelector(selectIsLoading);
@@ -17,6 +16,7 @@ export const ContactList = () => {
   useEffect(() => {
     dispatch(fetchContactsAction());
   }, [dispatch]);
+  const contacts = useSelector(selectFilteredContacts);
 
   return (
     <ul>

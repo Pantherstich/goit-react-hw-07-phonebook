@@ -3,17 +3,7 @@ import {
   addContactAction,
   deleteContactAction,
   fetchContactsAction,
-} from '../redux/api';
-// import {
-//   addContactAction,
-//   deleteContactAction,
-//   fetchContactsAction,
-// } from './api';
-// import {
-//   addContactAction,
-//   deleteContactAction,
-//   fetchContactsAction,
-// } from '../../redux/api';
+} from './api';
 
 const handlePending = state => {
   state.isLoading = true;
@@ -22,34 +12,36 @@ const handleRejected = (state, action) => {
   state.isLoading = false;
   state.error = action.payload;
 };
-const handleFulfilled = state => {
-  state.isLoading = false;
-  state.error = null;
+
+const contactsInitialState = {
+  items: [],
+  isLoading: false,
+  error: null,
 };
+
 const contactsSlice = createSlice({
   name: 'contacts',
-  initialState: {
-    items: [],
-    isLoading: false,
-    error: null,
-  },
+  initialState: contactsInitialState,
+
   extraReducers: builder => {
     builder
       .addCase(fetchContactsAction.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
         state.items = action.payload;
       })
       .addCase(addContactAction.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
         state.items.push(action.payload);
       })
       .addCase(deleteContactAction.fulfilled, (state, action) => {
-        const index = state.items.findIndex(
-          contact => contact.id === action.payload.id
-        );
-        state.items.splice(index, 1);
+        state.isLoading = false;
+        state.error = null;
+        state.items = state.items.filter(({ id }) => id !== action.payload.id);
       })
       .addMatcher(action => action.type.endsWith('pending'), handlePending)
-      .addMatcher(action => action.type.endsWith('rejected'), handleRejected)
-      .addMatcher(action => action.type.endsWith('fulfilled'), handleFulfilled);
+      .addMatcher(action => action.type.endsWith('rejected'), handleRejected);
   },
 });
 

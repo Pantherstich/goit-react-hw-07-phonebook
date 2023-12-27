@@ -5,8 +5,8 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectContacts } from '../../redux/selectors';
 import { addContactAction } from '../../redux/api';
-const nameId = nanoid();
-const numberId = nanoid();
+// const nameId = nanoid();
+// const numberId = nanoid();
 
 export const ContactForm = ({ sumbit }) => {
   const [name, setName] = useState('');
@@ -15,32 +15,54 @@ export const ContactForm = ({ sumbit }) => {
   const contacts = useSelector(selectContacts);
 
   const handleChange = event => {
-    const { name, value } = event.target;
-    switch (name) {
-      case 'name':
-        setName(value);
-        break;
-      case 'number':
-        setNumber(value);
-        break;
-      default:
-        break;
+    const { name, value } = event.currentTarget;
+    const trimmedValue = value.trim();
+    if (
+      (name === 'name' && /^[a-zA-Zа-яА-ЯёЁіІїЇєЄґҐ' ]*$/.test(trimmedValue)) ||
+      (name === 'number' && /^[0-9-]*$/.test(trimmedValue))
+    ) {
+      if (name === 'name') {
+        setName(trimmedValue);
+      } else if (name === 'number') {
+        setNumber(trimmedValue);
+      }
     }
   };
-
   const handleSubmit = event => {
     event.preventDefault();
 
-    const isExist = contacts.some(contact => contact.name === name);
-    if (isExist) {
-      alert(`${name} is in contacts`);
-      return;
-    }
-    dispatch(addContactAction({ name, number }));
+    const newContact = {
+      id: nanoid(),
+      name,
+      number,
+    };
 
+    const existingContact = contacts.find(
+      contact => contact.name.toLowerCase() === newContact.name.toLowerCase()
+    );
+
+    if (existingContact) {
+      alert(`${newContact.name} is already in contacts.`);
+    } else {
+      dispatch(addContactAction(newContact));
+    }
     setName('');
     setNumber('');
   };
+
+  // const handleSubmit = event => {
+  //   event.preventDefault();
+
+  //   const isExist = contacts.some(contact => contact.name === name);
+  //   if (isExist) {
+  //     alert(`${name} is in contacts`);
+  //     return;
+  //   }
+  //   dispatch(addContactAction({ name, number }));
+
+  //   setName('');
+  //   setNumber('');
+  // };
 
   return (
     <ContForm onSubmit={handleSubmit}>
@@ -50,7 +72,7 @@ export const ContactForm = ({ sumbit }) => {
           type="text"
           name="name"
           value={name}
-          id={nameId}
+          // id={nameId}
           onChange={handleChange}
           required
         />
@@ -61,7 +83,7 @@ export const ContactForm = ({ sumbit }) => {
           type="tel"
           name="number"
           value={number}
-          id={numberId}
+          // id={numberId}
           onChange={handleChange}
           required
         />
